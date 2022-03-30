@@ -1,9 +1,13 @@
+package App;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 public class ServletApplication {
 
-  private static Server createServer(int port) {
+  public static Counter counter = new Counter();
+
+  public static Server createServer(int port) {
     Server server = new Server(port);
     ServletHandler servletHandler = new ServletHandler();
     servletHandler.addServletWithMapping(ServletCounter.class, "/counter/*");

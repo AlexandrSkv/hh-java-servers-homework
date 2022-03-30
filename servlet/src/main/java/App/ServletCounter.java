@@ -1,12 +1,16 @@
+package App;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import static App.ServletApplication.counter;
+
 public class ServletCounter extends HttpServlet {
 
-    private int counter = 0;
+    //private int counter = 0;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -15,14 +19,14 @@ public class ServletCounter extends HttpServlet {
         switch (request.getRequestURI()) {
             case ("/counter"): {
                 response.setStatus(HttpServletResponse.SC_OK);
-                writer.print("<h1>Текущие состояние счетчика: " + counter + "</h1>");
+                writer.print("<h1>Текущие состояние счетчика: " + counter.getCounter() + "</h1>");
                 writer.flush();
                 break;
             }
             case ("/counter/clear"):
             {
-                response.setStatus(HttpServletResponse.SC_OK);
-                writer.print("<h1>Используйте POST для обнуления счетчика</h1>");
+                response.setHeader("Allow" , "POST");
+                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
                 writer.flush();
                 break;
             }
@@ -39,7 +43,7 @@ public class ServletCounter extends HttpServlet {
         switch (request.getRequestURI()) {
             case ("/counter"):
             {
-                counter += 1;
+                counter.increaseCounter();
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 writer.print("<h1>Значение счетчика увеличено</h1>");
@@ -48,7 +52,7 @@ public class ServletCounter extends HttpServlet {
             }
             case ("/counter/clear"):
             {
-                counter = 0;
+                counter.deleteCounter();
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 writer.print("<h1>Значение счетчика обнулено</h1>");
@@ -73,7 +77,7 @@ public class ServletCounter extends HttpServlet {
                 String value = request.getHeader("Subtraction-Value");
                 if (value != null) {
                     try {
-                        counter = counter - Integer.parseInt(value);
+                        counter.decreaseCounter(Integer.parseInt(value));
                         response.setStatus(HttpServletResponse.SC_OK);
                         writer.print("<h1>Значение счетчика уменьшено</h1>");
                         writer.flush();

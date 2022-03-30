@@ -1,3 +1,5 @@
+package App;
+
 import javax.ws.rs.core.Application;
 import java.util.Set;
 

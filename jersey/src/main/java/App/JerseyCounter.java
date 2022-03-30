@@ -1,38 +1,33 @@
+package App;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import Dto.DtoGetCounter;
 
-import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import java.util.Map;
 
-@Singleton
+import static App.JerseyApplication.counter;
+
 @Path("counter")
 public class JerseyCounter {
 
-    private int counter = 0;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @GET
     @Produces("application/json")
     public Response getCounter() throws JsonProcessingException {
-
-        ObjectNode json = mapper.createObjectNode();
-
-        json.put("date", java.time.Instant.now().toString());
-        json.put("value", counter);
-
-        String response = mapper.writeValueAsString(json);
-
+        DtoGetCounter dtoGetCounter = new DtoGetCounter(counter.getCounter());
+        String response = mapper.writeValueAsString(dtoGetCounter);
         return Response.status(200).entity(response).build();
     }
 
     @POST
     @Produces("text/html; charset=UTF-8")
     public Response postCounter() {
-        counter += 1;
+        counter.increaseCounter();
         String response = "<h1>Значение счетчика увеличено</h1>";
         return Response.status(200).entity(response).build();
     }
@@ -45,7 +40,7 @@ public class JerseyCounter {
 
         if (value != null){
             try {
-                counter = counter - Integer.parseInt(value);
+                counter.decreaseCounter(Integer.parseInt(value));
                 String response = "<h1>Значение счетчика уменьшено</h1>";
                 return Response.status(200).entity(response).build();
             }
@@ -79,7 +74,7 @@ public class JerseyCounter {
         }
 
         if (cookieFlag) {
-            counter = 0;
+            counter.deleteCounter();
             String response = "<h1>Значение счетчика обнулено</h1>";
             return Response.status(200).entity(response).build();
         }
